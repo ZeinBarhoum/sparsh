@@ -136,5 +136,4 @@ slurm/*
 *.jpg
 *.log
 slurm/*
-outputs/*
 checkpoints/*

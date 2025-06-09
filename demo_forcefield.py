@@ -4,6 +4,8 @@ import numpy as np
 import torch
 import torch.utils.data as data
 from omegaconf import OmegaConf, DictConfig
+from pprint import pprint
+import json
 
 
 def demo(cfg: DictConfig):
@@ -19,7 +21,7 @@ def demo(cfg: DictConfig):
     path_checkpoints = cfg.paths.output_dir + "/checkpoints/"
     eval_ckpts = sorted(os.listdir(path_checkpoints))
     eval_ckpts = [ckpt for ckpt in eval_ckpts if ckpt[-4:] == ".pth"]
-    last_ckpt = eval_ckpts[-1] #-3
+    last_ckpt = eval_ckpts[-1]  # -3
 
     cfg.task.checkpoint_task = f"{path_checkpoints}/{last_ckpt}"
     model = hydra.utils.instantiate(cfg.task)
@@ -43,12 +45,13 @@ def demo(cfg: DictConfig):
 
 @hydra.main(version_base="1.3", config_path="config")
 def main(cfg: DictConfig):
-    exp_name = f"{cfg.sensor}_{cfg.task_name}_{cfg.ssl_name}_vit{cfg.ssl_model_size}_{cfg.train_data_budget}" 
+    print(cfg)
+    exp_name = f"{cfg.sensor}_{cfg.task_name}_{cfg.ssl_name}_vit{cfg.ssl_model_size}_{cfg.train_data_budget}"
     path_outputs = cfg.paths.output_dir
     path_ckpt_encoders = cfg.task.checkpoint_encoder
 
     for exp in os.listdir(path_outputs):
-        if exp_name in exp and exp[0:4]!="2024":
+        if exp_name in exp and exp[0:4] != "2024":
             path_outputs = f"{path_outputs}/{exp}"
             break
 
@@ -64,6 +67,8 @@ def main(cfg: DictConfig):
 
     demo(cfg)
 
+
 if __name__ == "__main__":
     torch.set_float32_matmul_precision("medium")
     main()
+

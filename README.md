@@ -1,5 +1,59 @@
 # Sparsh: Self-supervised touch representations for vision-based tactile sensing
 
+## This FORK
+
+To run demo force field visualization, please follow these steps:
+
+- Clone this repository:
+
+```bash
+git clone https://github.com/ZeinBarhoum/sparsh.git
+cd sparsh
+```
+
+- Create a conda environment with dependencies (using either `conda` or `mamba`):
+
+```bash
+mamba env create -f environment.yml
+mamba activate tactile_ssl
+```
+
+- Download the decoder checkpoints (either using git lfs or manually) from Hugging Face using the [link](https://huggingface.co/facebook/sparsh-gelsight-forcefield-decoder), put `config.yaml , checkpoints/` from the repo in `outputs/`, the `outputs/` folder should look like this:
+
+```bash
+outputs
+├── checkpoints
+│   ├── epoch-0010.pth
+│   ├── epoch-0014.pth
+│   ├── epoch-0021.pth
+│   └── last.ckpt
+└── config.yaml
+```
+
+- Download the dino encoder checkpoints from Hugging Face using the [link](https://huggingface.co/facebook/sparsh-dino-base), put `dino_vit_base.ckpt, dino_vitbase.safetensors` in `sparsh_models/`, the `sparsh_models/` folder should look like this:
+
+```bash
+sparsh_models
+├── dino_vitbase.ckpt
+└── dino_vitbase.safetensors
+```
+
+- Determine the video ID of your GelSight Mini sensor. You can do this by running `v4l2-ctl --list-devices` in the terminal, which will list all video devices connected to your system, you should see something like this:
+
+```bash
+GelSight Mini R0B 2BBT-H0KC: Ge (usb-0000:00:14.0-2):
+	/dev/video4 # This is the video ID you need (4 in this case)
+	/dev/video5
+	/dev/media2
+```
+
+- Run the demo script with the following command, replacing `${YOUR_VIDEO_ID}` with the video ID you found in the previous step:
+
+```bash
+python demo_forcefield.py +experiment=downstream_task/forcefield/gelsight_dino paths=default  paths.log_dir=./experiments paths.output_dir=./outputs paths.encoder_checkpoint_root=./sparsh_models test.demo.gelsight_device_id=${YOUR_VIDEO_ID}
+```
+
+## Original README
 
 <p align="center">
 Carolina Higuera<sup>*</sup>,
@@ -33,7 +87,6 @@ Mustafa Mukadam
     <a href="https://huggingface.co/collections/facebook/sparsh-67167ce57566196a4526c328"><img src="https://img.shields.io/badge/Models%20and%20datasets-Link-yellow?logo=huggingface"></img></a>
     <a href="#-citing-sparsh"><img src="http://img.shields.io/badge/Cite-Us-orange.svg"></img></a>
 
-
 </p>
 
 <p align="center">
@@ -41,22 +94,23 @@ Mustafa Mukadam
 </p>
 Sparsh is a family of general touch representations trained via self-supervision algorithms such as MAE, DINO and JEPA. Sparsh is able to generate useful representations for DIGIT, Gelsight'17 and Gelsight Mini. It outperforms end-to-end models in the downstream tasks proposed in TacBench by a large margin, and can enable data efficient training for new downstream tasks.
 
-
 This repository contains the pytorch implementation, pre-trained models, and datasets released with Sparsh.
 
 <p align="center">
 <img src="assets/tacbench.gif" alt="animated" />
 </p>
 
-
 ## 🛠️Installation and setup
 
 Clone this repository:
+
 ```bash
 git clone https://github.com/facebookresearch/sparsh.git
 cd sparsh
 ```
+
 and create a conda environment with dependencies:
+
 ```bash
 mamba env create -f environment.yml
 mamba activate tactile_ssl
@@ -102,7 +156,6 @@ Pretrained model weights are available for download from our Hugging Face: [face
     </tr>
   </tbody>
 </table>
-
 
 ## 📥 Datasets
 
@@ -150,7 +203,6 @@ We also use sequences from the [ObjectFolder-Real](https://objectfolder.stanford
 
 We provide a script to download the preprocessed and compatible version of these datasets with our pipeline. To do so, run the bash script `scripts/download_gelsight_dataset.sh`. This will download and extract the data. Don't forget to edit `path_dataset` in the script.
 
-
 The structure of the dataset is:
 
 ```bash
@@ -173,12 +225,14 @@ To load this dataset, use `tactile_ssl/data/vision_tactile.py`
 ### Downstream task datasets
 
 We open-source the data that we collected in-house for force estimation, slip detection and pose estimation downstream tasks. The datasets can be downloaded from the Sparsh collection in Hugging Face:
+
 - Force estimation and Slip detection: [DIGIT](https://huggingface.co/datasets/facebook/digit-force-estimation), [GelSight Mini](https://huggingface.co/datasets/facebook/gelsight-force-estimation)
 - Pose estimation: [DIGIT](https://huggingface.co/datasets/facebook/digit-pose-estimation)
 
 Please locate these datasets in a directory designated for hosting all downstream task datasets.
 
 #### T1 Force estimation and T2 slip detection
+
 This dataset contains paired tactile and force data, intended for use in predicting 3-axis normal and shear forces applied to the sensor's elastomer. We used three different indenter shapes to collect force-labeled data: hemisphere, sharp, and flat. To measure force ground truths, we employed the ATI nano17 force/torque sensor. The protocol consisted of applying a random normal load followed by a shear load, achieved by sliding the probe 2mm on the sensor's elastomer.
 
 The dataset consists a collection of normal/shear load trajectories for each probe. The structure is as follows (example for DIGIT dataset):
@@ -202,7 +256,9 @@ T1_force/digit/flat
 T1_force/digit/sharp
 ├── ....
 ```
+
 For each batch:
+
 - `dataset_digit_xy.pkl`: contains the binarized tactile images only.
 - `dataset_slip_forces.pkl`: it's a dictionary where each key represents a sliding trajectory. Each trajectory has the corresponding force and slip labels.
 
@@ -213,13 +269,14 @@ To load this dataset (DIGIT and GelSight Mini), use `tactile_ssl/data/vision_bas
 This dataset contains time-synchronized pairs of DIGIT images and SE(3) object poses. In our setup, the robot hand is stationary with its palm facing downwards and pressing against the object on a table. The robot hand has DIGIT sensors mounted on the index, middle, and ring fingertips, all of which are in contact with the object. A human manually perturbs the object's pose by translating and rotating it in SE(2). We use tag tracking to obtain the object's pose. We collect data using two objects: a Pringles can and the YCB sugar box, both of which have a tag fixed to their top surfaces.
 
 The dataset is a collection of sequences where a human manually perturbs the object's pose. We collect data using two objects: a Pringles can and the YCB sugar box. Each sequence corresponds to a pickle file containing the following labeled data:
+
 - DIGIT tactile images for index, middle and ring fingers
 - Object pose tracked from tag in format (x, y, z, qw, qx, qy, qz)
 - Robot hand joint positions
 - `object_index_rel_pose_n5`: the pose change within the last 5 samples as a transformation matrix. The object pose is with respect to the index finger.
 - `object_middle_rel_pose_n5`: the pose change within the last 5 samples as a transformation matrix. The object pose is with respect to the middle finger.
 - `object_ring_rel_pose_n5`: the pose change within the last 5 samples as a transformation matrix. The object pose is with respect to the ring finger.
-We also provide reference (no contact) images for each of the DIGITs to facilitate pre-processing such as background subtraction.
+  We also provide reference (no contact) images for each of the DIGITs to facilitate pre-processing such as background subtraction.
 
 ```bash
 T3_pose/digit/train
@@ -247,13 +304,14 @@ T3_pose/digit/bgs
 To load this dataset use `tactile_ssl/data/vision_based_pose_probes.py`
 
 #### T4 Grasp stability
+
 We use the [Feeling of Success](https://sites.google.com/view/the-feeling-of-success/) dataset. It contains approximately 9k grasp trials over 100k objects using GelSight'17 sensors mounted on a parallel gripper.
 
 You can download the data directly from the webpage or run the bash script `scripts/download_datasets_scratch/download_gelsight_feeling_success.sh` to download the data and the Python script `scripts/download_datasets_scratch/compress_feeling_success.py` to preprocess the dataset compatible with our pipeline. Please update the paths in the scripts accordingly.
 
 #### T5 Textile recognition
 
-Please download the [Clothing dataset](http://data.csail.mit.edu/active_clothing/Data_ICRA18.tar). The dataset consist of 4467 short video clips (10-25 frames), of a robot with a GelSight'17 grasping several types of textile (20  classes), such as leather, cotton, polyester, etc.
+Please download the [Clothing dataset](http://data.csail.mit.edu/active_clothing/Data_ICRA18.tar). The dataset consist of 4467 short video clips (10-25 frames), of a robot with a GelSight'17 grasping several types of textile (20 classes), such as leather, cotton, polyester, etc.
 
 ## 🏋️‍♂️ Training Sparsh
 
@@ -291,6 +349,7 @@ For training downstream tasks, in our paper we largely follow frozen evaluation,
 Training downstream tasks is quite similar to the above instructions but additionally requires a pre-trained model checkpoint `checkpoint_encoder` which can be specified by updating the `task.checkpoint_encoder` field in the config. Downstream tasks also need a labeled dataset for the corresponding downstream task.
 
 Use the following script to train downstream tasks:
+
 ```bash
 python train_task.py --config-name=experiment/downstream_task/${EXPERIMENT} paths=${YOUR_PATH_CONFIG} wandb=${YOUR_WANDB_CONFIG}
 ```
@@ -308,16 +367,21 @@ Finally, we also `tacbench_report.ipynb` where we compute metrics for all the do
 For testing Sparsh(DINO) + force field decoder live, you only need one DIGIT or GelSight Mini sensor. Follow these steps to run the demo:
 
 1. Create a folder for downloading the task checkpoints. For example, `${YOUR_PATH}/outputs_sparsh/checkpoints`.
-<!-- UPDATE THIS -->
-2. Download the decoder checkpoints from Hugging Face for [DIGIT](https://huggingface.co/facebook/sparsh-digit-forcefield-decoder) and [GelSight Mini](https://huggingface.co/facebook/sparsh-gelsight-forcefield-decoder).
-3. Connect the sensor to your PC. In case of DIGIT, please make sure you have [digit-interface](https://github.com/facebookresearch/digit-interface) installed.
-4. Make sure the device is recognized by the OS (you can use Cheese in Linux to see the video that the sensor is streaming).
 
-5. Running the demo for DIGIT:
+<!-- UPDATE THIS -->
+
+2. Download the decoder checkpoints from Hugging Face for [DIGIT](https://huggingface.co/facebook/sparsh-digit-forcefield-decoder) and [GelSight Mini](https://huggingface.co/facebook/sparsh-gelsight-forcefield-decoder).
+
+1. Connect the sensor to your PC. In case of DIGIT, please make sure you have [digit-interface](https://github.com/facebookresearch/digit-interface) installed.
+
+1. Make sure the device is recognized by the OS (you can use Cheese in Linux to see the video that the sensor is streaming).
+
+1. Running the demo for DIGIT:
 
 ```bash
 python demo_forcefield.py +experiment=downstream_task/forcefield/digit_dino paths=${YOUR_PATH_CONFIG} paths.output_dir=${YOUR_PATH}/outputs_sparsh/checkpoints/ test.demo.digit_serial=${YOUR_DIGIT_SERIAL}`
 ```
+
 The DIGIT serial number is printed on the back of the sensor and has the format `DXXXXX`.
 
 6. Running the demo for GelSight Mini:
@@ -330,14 +394,14 @@ The GelSight Mini is recognized as a webcam. You can get the video ID by checkin
 
 7. Take the sensor and slide it across the edge of a table, or across objects with interesting textures! Look at the normal field to localize where you're making contact on the sensor's surface. Look at the shear field to gather an intuition about the direction of the shear force that you applied while sliding the sensor. For example, slide the sensor over an edge up and down to get translational shear or rotate the sensor in place to see torsional slip!
 
-
 ## License
-This project is licensed under [LICENSE](LICENSE).
 
+This project is licensed under [LICENSE](LICENSE).
 
 ## 📚 Citing Sparsh
 
 If you find this repository useful, please consider giving a star :star: and citation:
+
 ```
 @inproceedings{
     higuera2024sparsh,
@@ -351,8 +415,6 @@ If you find this repository useful, please consider giving a star :star: and cit
 
 ## 🤝 Acknowledgements
 
-
 We thank Ishan Misra, Mahmoud Assran for insightful discussions on SSL for vision that informed this work, and Changhao Wang, Dhruv Batra, Jitendra Malik, Luis Pineda, Tess Hellebrekers for helpful discussions on the research.
 
-
-We also thank the team behind datasets like [YCB-Slide](https://github.com/rpl-cmu/YCB-Slide), [Touch and Go](https://touch-and-go.github.io/), [ObjectFolder-Real](https://objectfolder.stanford.edu/objectfolder-real-download), [Feeling of Success](https://sites.google.com/view/the-feeling-of-success/)  and [Clothing dataset](http://data.csail.mit.edu/active_clothing/Data_ICRA18.tar) for contributing to the research community by open-sourcing their tactile data.
+We also thank the team behind datasets like [YCB-Slide](https://github.com/rpl-cmu/YCB-Slide), [Touch and Go](https://touch-and-go.github.io/), [ObjectFolder-Real](https://objectfolder.stanford.edu/objectfolder-real-download), [Feeling of Success](https://sites.google.com/view/the-feeling-of-success/) and [Clothing dataset](http://data.csail.mit.edu/active_clothing/Data_ICRA18.tar) for contributing to the research community by open-sourcing their tactile data.
