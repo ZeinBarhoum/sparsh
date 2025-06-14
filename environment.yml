@@ -18,7 +18,7 @@ dependencies:
       - scipy
       - scikit-learn
       - tqdm
-      - opencv
+      - opencv-python
       - rich
       - h5py
       - wandb
