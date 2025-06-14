@@ -1,0 +1,21 @@
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch==2.7.0
+torchvision
+xformers==0.0.30
+lightning
+rootutils
+pre-commit
+ikpy
+gdown==5.1.0
+seaborn
+scipy
+scikit-learn
+tqdm
+opencv-python
+rich
+h5py
+wandb
+matplotlib
+hydra-core
+hydra-colorlog
+einops
