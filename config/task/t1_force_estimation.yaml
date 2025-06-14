@@ -27,6 +27,9 @@ trainer:
   checkpoint_interval_type: 'log'
   max_task_checkpoints: 10
   save_probe_weights_only: True
+  accelerator: cuda
+  devices: 1
+
 
 data:
   train_data_budget: ${train_data_budget}
