@@ -37,7 +37,11 @@ data:
 
 test:
   data:
-    dataset_name: ["flat/batch_1"]
+    dataset_name: [
+      "flat/batch_2",
+      "sharp/batch_2",
+      "sphere/batch_6",
+    ]
     batch_size: 200
   tester:
     _partial_: True
