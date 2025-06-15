@@ -15,13 +15,18 @@ dataset:
 
     path_dataset: ${paths.data_root}/tacbench_data/T1_force/gelsight/
     list_datasets: [
-      "sphere/batch_1",
+      "flat/batch_1",
       "sharp/batch_1",
-      "sharp/batch_2",
+      "sphere/batch_1",
       "sphere/batch_2",
+      "sphere/batch_3",
+      "sphere/batch_4",
+      "sphere/batch_5",
     ]
     list_datasets_test: [
-      "flat/batch_1",
+      "flat/batch_2",
+      "sharp/batch_2",
+      "sphere/batch_6",
     ]
     look_in_folder: false
 
