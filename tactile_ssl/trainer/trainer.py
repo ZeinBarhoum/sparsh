@@ -225,6 +225,7 @@ class Trainer:
 
         self.state = state
 
+        self.save_checkpoint()
         # Always start with one validation loop first
         if self.sanity_validate and self.should_validate:
             self.val_loop(module, val_loader, limit_batches=self.limit_val_batches)
