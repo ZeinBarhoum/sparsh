@@ -18,7 +18,6 @@ from tactile_ssl.data.digit.utils import (
     get_resize_transform,
 )
 
-from digit_interface.digit import Digit
 
 
 class DemoForceFieldData:
@@ -90,6 +89,7 @@ class DemoForceFieldData:
 
     def connect_digit(self):
         # Connect to a Digit device with serial number with friendly name
+        from digit_interface.digit import Digit
         assert self.digit_serial is not None, ValueError("Digit serial number is required")
         digit_sensor = Digit(self.digit_serial, "Digit")
         digit_sensor.connect()
