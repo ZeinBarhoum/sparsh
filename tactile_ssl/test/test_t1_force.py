@@ -95,6 +95,8 @@ class TestForceSL(TestTaskSL):
         )
         sem = rmse_std / np.sqrt(forces_gt.shape[0])
         ci95 = 1.96 * rmse_std / np.sqrt(forces_gt.shape[0])
+        rms_force = np.sqrt(forces_gt**2).mean(axis=1).mean()
+        rrmse = rmse / rms_force
 
         if not over_all_outputs:
             print("Metrics for {self.task}_{self.dataset_name}:")
@@ -102,12 +104,15 @@ class TestForceSL(TestTaskSL):
             print("Metrics for all outputs:")
 
         print(f"RMSE: {rmse} ± {rmse_std} N")
+        print(f"RMS Force: {rms_force} N")
+        print(f"RRMSE: {rrmse} (relative)")
         print(f"Correlation: {corr}")
         print(f"Total samples: {forces_gt.shape[0]}")
 
         metrics = {
             "rmse": rmse,
             "rmse_std": rmse_std,
+            "rrmse": rrmse,
             "corr": corr,
             "sem": sem,
             "ci95": ci95,
@@ -136,3 +141,4 @@ class TestForceSL(TestTaskSL):
         img_corr.save(f"{self.path_outputs}/{self.epoch}_correlation.png")
         img_err.save(f"{self.path_outputs}/{self.epoch}_XYZerror.png")
         img_cone.save(f"{self.path_outputs}/{self.epoch}_ConeError.png")
+
