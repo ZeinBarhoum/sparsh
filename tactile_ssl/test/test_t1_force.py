@@ -88,6 +88,13 @@ class TestForceSL(TestTaskSL):
         forces_gt = outputs["forces_gt"] * scale  # in N
         forces_pred = outputs["forces_pred"] * scale  # in N
 
+        rmse_3d = np.sqrt(np.mean((forces_gt - forces_pred) ** 2, axis=0))
+        rmse_1d = np.mean(rmse_3d)
+        rms_force_3d = np.sqrt(np.mean(forces_gt**2, axis=0))
+        rms_force = np.mean(rms_force_3d)
+        rrmse_3d = rmse_3d / rms_force_3d
+        rrmse_1d = rmse_1d / rms_force
+
         rmse = np.sqrt((forces_gt - forces_pred) ** 2).mean(axis=1).mean()
         rmse_std = np.sqrt((forces_gt - forces_pred) ** 2).std(axis=1).mean()
         corr = np.array(
@@ -103,13 +110,29 @@ class TestForceSL(TestTaskSL):
         else:
             print("Metrics for all outputs:")
 
+        print("CORRECTED VALUES")
+        print(f"RMSE (3D): {rmse_3d} N")
+        print(f"RMSE (1D): {rmse_1d} N")
+        print(f"RMS Force (3D): {rms_force_3d} N")
+        print(f"RMS Force (1D): {rms_force} N")
+        print(f"RRMSE (3D): {rrmse_3d} (relative)")
+        print(f"RRMSE (1D): {rrmse_1d} (relative)")
+
+        print("OLD VALUES")
         print(f"RMSE: {rmse} ± {rmse_std} N")
         print(f"RMS Force: {rms_force} N")
         print(f"RRMSE: {rrmse} (relative)")
         print(f"Correlation: {corr}")
+
         print(f"Total samples: {forces_gt.shape[0]}")
 
         metrics = {
+            "correct_rmse_3d": rmse_3d,
+            "correct_rmse_1d": rmse_1d,
+            "correct_rms_force_3d": rms_force_3d,
+            "correct_rms_force_1d": rms_force,
+            "correct_rrmse_3d": rrmse_3d,
+            "correct_rrmse_1d": rrmse_1d,
             "rmse": rmse,
             "rmse_std": rmse_std,
             "rrmse": rrmse,
@@ -141,4 +164,3 @@ class TestForceSL(TestTaskSL):
         img_corr.save(f"{self.path_outputs}/{self.epoch}_correlation.png")
         img_err.save(f"{self.path_outputs}/{self.epoch}_XYZerror.png")
         img_cone.save(f"{self.path_outputs}/{self.epoch}_ConeError.png")
-
