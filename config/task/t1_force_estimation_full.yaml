@@ -30,7 +30,7 @@ data:
   val_data_budget: ${val_data_budget}
 test:
   data:
-    dataset_name: [flat/batch_1]
+    dataset_name: [flat/batch_2, sharp/batch_2, sphere/batch_6]
     batch_size: 1000
   tester:
     _partial_: true

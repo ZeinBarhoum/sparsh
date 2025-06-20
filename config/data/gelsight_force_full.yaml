@@ -14,14 +14,11 @@ dataset:
     frame_stride: 5  # temporal stride between frames in input 
     path_dataset: ${paths.data_root}/tacbench_data/T1_force/gelsight/
     list_datasets:
-      - flat/batch_1
-      - sharp/batch_1
       - sphere/batch_1
+      - sharp/batch_1
+      - sharp/batch_2
       - sphere/batch_2
-      - sphere/batch_3
-      - sphere/batch_4
-      - sphere/batch_5
-    list_datasets_test: [flat/batch_1, sharp/batch_2, sphere/batch_6]
+    list_datasets_test: [flat/batch_1]
     look_in_folder: false
     slip_horizon: 0
     max_abs_forceXYZ: [1.5, 1.5, 2.0]  # N (if need to assign different values for each dataset, use sphere_max_abs_forceXYZ, sharp_max_abs_forceXYZ, hex_max_abs_forceXYZ)
